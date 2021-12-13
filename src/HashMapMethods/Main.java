@@ -1,14 +1,22 @@
 package HashMapMethods;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
-        HahsMapImplementation <String, String> one = new HahsMapImplementation<>();
-        one.put("Богдан", "Щеглюк");
-        one.put("Олексій", "Хомишин");
-        one.show();
-        System.out.println(one.get("Богдан"));
-        System.out.println(one.size());
-         }
+
+        HahsMapImplementation<Integer, String> two = new HahsMapImplementation<>();
+        for (int i = 0; i<100; i++) {
+            two.put((int)(Math.random()*10000), String.valueOf((int)(Math.random()*10000)));
+        }
+        System.out.println("Fiiled Buckets: "+two.counter);
+        System.out.println("Numbers of elements: "+ two.size());
+        two.show();
+        System.out.println("length of tab: "+two.getTab().length);
+        System.out.println("numberOfCoinsedence: "+two.numberOfCoinsedence);
+        two.getValues();
+        two.getKeySet();
+    }
 }
