@@ -14,8 +14,6 @@ public class Main {
         System.out.println("Fiiled Buckets: "+two.counter);
         System.out.println("Numbers of elements: "+ two.size());
         two.show();
-        System.out.println("length of tab: "+two.getTab().length);
-        System.out.println("numberOfCoinsedence: "+two.numberOfCoinsedence);
         two.getValues();
         two.getKeySet();
     }

@@ -3,7 +3,7 @@ package HashMapMethods;
 
 import java.util.Map;
 
-public class Node<K, V> {
+class Node<K, V> {
 
     private K key; //private
     private V value;
