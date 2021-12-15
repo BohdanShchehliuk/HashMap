@@ -6,7 +6,7 @@ public class HahsMapImplementation<K, V> implements HashMapInterface<K, V> {
     private final int INIZIALIZATION_SIZE = 16;
     private final double RESIZE_LIMIT = 0.70;// 70 persantege
     private final double RESIZE_COEFFICIENT = 1.50;// 150 persantege
-       int counter;
+    int counter;
     int size; // кількість всіх елементів
 
     private Node<K, V>[] tab;
@@ -14,54 +14,59 @@ public class HahsMapImplementation<K, V> implements HashMapInterface<K, V> {
     public HahsMapImplementation() {
         tab = new Node[INIZIALIZATION_SIZE];
     }
-    public int position(int code) {
-        int position = Math.abs((code >> 2)) % tab.length;
-        return position;
+
+    public int findPosition(int code) {
+        int positionInTab = Math.abs((code >> 2)) % tab.length;
+        return positionInTab;
     }
 
-// метод, який збільшує розір масиву, у випадку заповнення його на 70%
-   // Використовую >> 2 а не >>> 16, оскільки під час моєї простих обкєтів: хеш.код >>> 16 завжди = 0
+    // метод, який збільшує розір масиву, у випадку заповнення його на 70%
+    // Використовую >> 2 а не >>> 16, оскільки під час моєї простих обкєтів: хеш.код >>> 16 завжди = 0
     private void resize() {
         if (counter < RESIZE_LIMIT * tab.length) {
             return;
         } else {
-            Node<K, V>[] tabNew = new Node[(int) (tab.length * RESIZE_COEFFICIENT)];
-            for (Node tmp : tab) {
+            size = 0;
+            counter = 0;
+            Node<K, V>[] tabOld = tab;
+            tab = new Node[(int) (tab.length * RESIZE_COEFFICIENT)];
+            for (Node<K, V> tmp : tabOld) {
                 if (tmp != null) {
-                   tabNew[position(tmp.getHASH())] = tmp;
+                    Node<K, V> nodeOne = tmp;
+                    while (nodeOne != null) {
+                        put(nodeOne.getKey(), nodeOne.getValue());
+                        nodeOne = nodeOne.getNext();
+                    }
                 }
             }
-            tab = tabNew;
+
         }
     }
 
-
-
     @Override
-    public void put(K key, V value) {
-        Node<K, V> node = new Node(key, value);
-        int position = position(node.getHASH());
+    public void put(K InputKey, V value) {
+        Node<K, V> node = new Node(InputKey, value);
+        int position = findPosition(node.getHASH());
         if (tab[position] == null) {
             tab[position] = node;
             counter++;
             size++;
-        } else if (tab[position].getKey().equals(key)) {
-            tab[position] = node;
         } else {
             Node nodeOne = tab[position];
             while (nodeOne.getNext() != null) {
-                if (nodeOne.getKey().equals(key)) {
+                if (nodeOne.getKey().equals(InputKey)) {
                     nodeOne.setValue(value);
                     return;
                 } else {
                     nodeOne = nodeOne.getNext();
                 }
             }
-            nodeOne.setNext(new Node(key, value));
+            nodeOne.setNext(new Node(InputKey, value));
             size++;
         }
         resize();
     }
+
     //для самопепевірки
     public void show() {
         System.out.println("ВСІ бакети:" + Arrays.toString(tab));
@@ -69,17 +74,13 @@ public class HahsMapImplementation<K, V> implements HashMapInterface<K, V> {
 
     @Override
     public V get(K key) {
-        if (key.equals(null)) {
-            return null;
-        } else {
-            int position = position(key.hashCode());
-            Node nodeOne = tab[position];
-            while (nodeOne.getNext() != null) {
-                if (nodeOne.getKey().equals(key)) {
-                    return (V) nodeOne.getValue();
-                } else {
-                    nodeOne = nodeOne.getNext();
-                }
+        int position = findPosition(key.hashCode());
+        Node<K, V> nodeOne = tab[position];
+        while (nodeOne.getNext() != null) {
+            if (nodeOne.getKey().equals(key)) {
+                return nodeOne.getValue();
+            } else {
+                nodeOne = nodeOne.getNext();
             }
         }
         return null;
@@ -92,14 +93,14 @@ public class HahsMapImplementation<K, V> implements HashMapInterface<K, V> {
 
     @Override
     public void getKeySet() {
+        System.out.println("All Keys:");
         int printNumbOfKey = 0;
         for (int i = 0; i < tab.length; i++) {
             if (tab[i] != null) {
                 System.out.print(tab[i].getKey() + "; ");
                 printNumbOfKey++;
-                Node nodeOne = tab[i];
-                nodeOne = nodeOne.getNext();
-                while (nodeOne != null) {
+                Node<K, V> nodeOne = tab[i];
+                while (nodeOne.getNext() != null) {
                     System.out.print(nodeOne.getKey() + "; ");
                     printNumbOfKey++;
                     nodeOne = nodeOne.getNext();
@@ -111,14 +112,14 @@ public class HahsMapImplementation<K, V> implements HashMapInterface<K, V> {
 
     @Override
     public void getValues() {
+        System.out.println("All Values:");
         int printNumbOfValuses = 0;
         for (int i = 0; i < tab.length; i++) {
             if (tab[i] != null) {
-                Node nodeOne = tab[i];
+                Node<K, V> nodeOne = tab[i];
                 System.out.print(nodeOne.getValue() + "; ");
                 printNumbOfValuses++;
-                nodeOne = nodeOne.getNext();
-                while (nodeOne != null) {
+                while (nodeOne.getNext() != null) {
                     System.out.print(nodeOne.getValue() + "; ");
                     printNumbOfValuses++;
                     nodeOne = nodeOne.getNext();

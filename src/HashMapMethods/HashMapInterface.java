@@ -1,7 +1,7 @@
 package HashMapMethods;
 
 public interface HashMapInterface <K, V>{
-    void  put(K key, V value);
+    void  put(K Inputkey, V value);
     V get(K key);
     int size();
     void getKeySet();
