@@ -1,15 +1,18 @@
 package HashMapMethods;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class HahsMapImplementation<K, V> implements HashMapInterface<K, V> {
     private final int INIZIALIZATION_SIZE = 16;
     private final double RESIZE_LIMIT = 0.70;// 70 persantege
     private final double RESIZE_COEFFICIENT = 1.50;// 150 persantege
-    int counter;
+    int counter; // визначає кількість заповнених бакетів у масиві.
     int size; // кількість всіх елементів
 
     private Node<K, V>[] tab;
+    private Node<K, V> nodeTemporary;
 
     public HahsMapImplementation() {
         tab = new Node[INIZIALIZATION_SIZE];
@@ -32,10 +35,10 @@ public class HahsMapImplementation<K, V> implements HashMapInterface<K, V> {
             tab = new Node[(int) (tab.length * RESIZE_COEFFICIENT)];
             for (Node<K, V> tmp : tabOld) {
                 if (tmp != null) {
-                    Node<K, V> nodeOne = tmp;
-                    while (nodeOne != null) {
-                        put(nodeOne.getKey(), nodeOne.getValue());
-                        nodeOne = nodeOne.getNext();
+                    Node<K, V> nodeTemporary = tmp;
+                    while (nodeTemporary != null) {
+                        put(nodeTemporary.getKey(), nodeTemporary.getValue());
+                        nodeTemporary = nodeTemporary.getNext();
                     }
                 }
             }
@@ -46,22 +49,26 @@ public class HahsMapImplementation<K, V> implements HashMapInterface<K, V> {
     @Override
     public void put(K InputKey, V value) {
         Node<K, V> node = new Node(InputKey, value);
-        int position = findPosition(node.getHASH());
+        int position = findPosition(node.getKey().hashCode());
         if (tab[position] == null) {
             tab[position] = node;
             counter++;
             size++;
         } else {
-            Node nodeOne = tab[position];
-            while (nodeOne.getNext() != null) {
-                if (nodeOne.getKey().equals(InputKey)) {
-                    nodeOne.setValue(value);
+            Node nodeTemporary = tab[position];
+            while (nodeTemporary.getNext() != null) {
+                if (nodeTemporary.getKey().equals(InputKey)) {
+                    nodeTemporary.setValue(value);
                     return;
                 } else {
-                    nodeOne = nodeOne.getNext();
+                    nodeTemporary = nodeTemporary.getNext();
                 }
             }
-            nodeOne.setNext(new Node(InputKey, value));
+            if (nodeTemporary.getKey().equals(InputKey)) {
+                nodeTemporary.setValue(value);
+                return;
+            }
+            nodeTemporary.setNext(new Node(InputKey, value));
             size++;
         }
         resize();
@@ -75,13 +82,17 @@ public class HahsMapImplementation<K, V> implements HashMapInterface<K, V> {
     @Override
     public V get(K key) {
         int position = findPosition(key.hashCode());
-        Node<K, V> nodeOne = tab[position];
-        while (nodeOne.getNext() != null) {
-            if (nodeOne.getKey().equals(key)) {
-                return nodeOne.getValue();
+        Node<K, V> nodeTemporary = tab[position];
+        while (nodeTemporary.getNext() != null) {
+            if (nodeTemporary.getKey().equals(key)) {
+                return nodeTemporary.getValue();
             } else {
-                nodeOne = nodeOne.getNext();
+                nodeTemporary = nodeTemporary.getNext();
             }
+
+        }
+        if (nodeTemporary.getKey().equals(key)) {
+            return nodeTemporary.getValue();
         }
         return null;
     }
@@ -92,40 +103,80 @@ public class HahsMapImplementation<K, V> implements HashMapInterface<K, V> {
     }
 
     @Override
-    public void getKeySet() {
+    public List getKeySet() {
+        List<K> list = new ArrayList<K>();
         System.out.println("All Keys:");
-        int printNumbOfKey = 0;
         for (int i = 0; i < tab.length; i++) {
             if (tab[i] != null) {
                 System.out.print(tab[i].getKey() + "; ");
-                printNumbOfKey++;
-                Node<K, V> nodeOne = tab[i];
-                while (nodeOne.getNext() != null) {
-                    System.out.print(nodeOne.getKey() + "; ");
-                    printNumbOfKey++;
-                    nodeOne = nodeOne.getNext();
+                Node<K, V> nodeTemporary = tab[i];
+                while (nodeTemporary.getNext() != null) {
+                    list.add(nodeTemporary.getKey());
+                    nodeTemporary = nodeTemporary.getNext();
                 }
             }
         }
-        System.out.println("\nNuymber of Keys:" + printNumbOfKey);
+        return list;
     }
 
     @Override
-    public void getValues() {
+    public List getValues() {
+        List<V> list = new ArrayList<>();
         System.out.println("All Values:");
-        int printNumbOfValuses = 0;
         for (int i = 0; i < tab.length; i++) {
             if (tab[i] != null) {
-                Node<K, V> nodeOne = tab[i];
-                System.out.print(nodeOne.getValue() + "; ");
-                printNumbOfValuses++;
-                while (nodeOne.getNext() != null) {
-                    System.out.print(nodeOne.getValue() + "; ");
-                    printNumbOfValuses++;
-                    nodeOne = nodeOne.getNext();
+                Node<K, V> nodeTemporary = tab[i];
+                System.out.print(nodeTemporary.getValue() + "; ");
+                while (nodeTemporary.getNext() != null) {
+                    list.add(nodeTemporary.getValue());
+                    nodeTemporary = nodeTemporary.getNext();
                 }
             }
         }
-        System.out.println("\nNuymber of Values:" + printNumbOfValuses);
+        return list;
     }
+}
+
+class Node<K, V> {
+
+    private K key; //private
+    private V value;
+    private Node next;
+
+    public void setNext(Node next) {
+        this.next = next;
+    }
+
+    public void setValue(V value) {
+        this.value = value;
+    }
+
+    public Node(K key, V value) {
+        this.key = key;
+        this.value = value;
+        this.next = next;
+
+    }
+
+    public K getKey() {
+        return key;
+    }
+
+    public V getValue() {
+        return value;
+    }
+
+    public Node getNext() {
+        return next;
+    }
+
+
+    @Override
+    public String toString() {
+        return "{" +
+                "key=" + key +
+                ", value=" + value +
+                '}';
+    }
+
 }

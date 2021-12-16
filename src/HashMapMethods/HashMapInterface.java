@@ -1,9 +1,15 @@
 package HashMapMethods;
 
-public interface HashMapInterface <K, V>{
-    void  put(K Inputkey, V value);
+import java.util.List;
+
+public interface HashMapInterface<K, V> {
+    void put(K Inputkey, V value);
+
     V get(K key);
+
     int size();
-    void getKeySet();
-    void getValues();
+
+    List<V> getKeySet();
+
+    List<K> getValues();
 }
